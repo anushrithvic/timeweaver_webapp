@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver Admin | v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .sidebar-item.active { background-color: #f0f4ff; color: #4f46e5; border-right: 4px solid #4f46e5; }
+        .timetable-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); }
+        .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <i class="fa-solid fa-clock-rotate-left text-white text-xl"></i>
+                </div>
+                <h1 class="font-bold text-xl tracking-tight">TimeWeaver</h1>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 mt-4">
+                <button onclick="showPage('overview')" id="btn-overview" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span class="font-medium text-sm">Overview</span>
+                </button>
+                <button onclick="showPage('faculty')" id="btn-faculty" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-id-card-clip w-5"></i>
+                    <span class="font-medium text-sm">Faculty Manager</span>
+                </button>
+                <button onclick="showPage('timetable')" id="btn-timetable" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="font-medium text-sm">Master Schedule</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+
+            <div id="page-overview" class="page-content p-8">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-800">System Dashboard</h2>
+                    <p class="text-slate-500 mt-1">Real-time institutional resource monitoring.</p>
+                </header>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+                            <i class="fa-solid fa-user-tie text-xl"></i>
+                        </div>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Faculty</p>
+                        <p class="text-3xl font-black mt-1" id="stat-faculty-count">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-4 text-green-600">
+                            <i class="fa-solid fa-compass-drafting text-xl"></i>
+                        </div>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Utilization</p>
+                        <p class="text-3xl font-black mt-1">84%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-faculty" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Faculty & Workload</h2>
+                        <p class="text-slate-500">Assign hours and monitor capacity limits.</p>
+                    </div>
+                    <button onclick="toggleModal(true)" class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Faculty
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Faculty Member</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-right">Workload Progress</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faculty-list" class="divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-timetable" class="page-content p-8 hidden">
+                <div class="flex flex-col lg:flex-row justify-between items-end gap-4 mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Master Schedule Engine</h2>
+                    <div class="flex gap-2 p-1.5 bg-slate-200/50 rounded-xl">
+                        <select class="bg-white rounded-lg px-4 py-2 text-sm font-semibold border-none focus:ring-2 ring-indigo-500"><option>CS Dept</option></select>
+                        <select class="bg-white rounded-lg px-4 py-2 text-sm font-semibold border-none focus:ring-2 ring-indigo-500"><option>Year 3</option></select>
+                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Filter</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-x-auto">
+                    <div class="min-w-[1000px]">
+                        <div class="timetable-grid bg-slate-800 text-white font-bold text-[11px] uppercase tracking-widest">
+                            <div class="p-5 border-r border-slate-700">Hour</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Monday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Tuesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Wednesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Thursday</div>
+                            <div class="p-5 text-center">Friday</div>
+                        </div>
+                        <div id="timetable-body"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add Faculty Member</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
+                    <input type="text" id="fac-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label>
+                        <select id="fac-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>CS</option><option>IT</option><option>EE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Max Hours</label>
+                        <input type="number" id="fac-max" value="18" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                    </div>
+                </div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3">
+                <button onclick="toggleModal(false)" class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button>
+                <button onclick="saveFaculty()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add to System</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DATA LAYER
+        let facultyData = JSON.parse(localStorage.getItem('timeWeaver_faculty')) || [
+            { id: 1, name: "Dr. Sarah Thorne", dept: "CS", current: 16, max: 18 },
+            { id: 2, name: "Prof. Alan Turing", dept: "CS", current: 12, max: 15 }
+        ];
+
+        // UI HELPERS
+        function toggleModal(show) {
+            document.getElementById('modal').classList.toggle('hidden', !show);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            document.getElementById(`btn-${pageId}`).classList.add('active');
+        }
+
+        // PERSISTENCE & RENDERING
+        function saveFaculty() {
+            const name = document.getElementById('fac-name').value;
+            const dept = document.getElementById('fac-dept').value;
+            const max = parseInt(document.getElementById('fac-max').value);
+
+            if(!name) return alert("Please enter a name");
+
+            facultyData.push({ id: Date.now(), name, dept, current: 0, max });
+            localStorage.setItem('timeWeaver_faculty', JSON.stringify(facultyData));
+
+            toggleModal(false);
+            renderFaculty();
+            updateStats();
+        }
+
+        function deleteFaculty(id) {
+            facultyData = facultyData.filter(f => f.id !== id);
+            localStorage.setItem('timeWeaver_faculty', JSON.stringify(facultyData));
+            renderFaculty();
+            updateStats();
+        }
+
+        function renderFaculty() {
+            const list = document.getElementById('faculty-list');
+            list.innerHTML = facultyData.map(f => {
+                const isOver = f.current > f.max;
+                const percent = Math.min((f.current / f.max) * 100, 100);
+                return `
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-8 py-5 font-bold text-slate-700">${f.name}</td>
+                        <td class="px-8 py-5 text-slate-500 text-sm font-medium">${f.dept}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xs font-black mb-2 ${isOver ? 'text-red-500' : 'text-indigo-600'}">${f.current} / ${f.max} HRS</span>
+                                <div class="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full ${isOver ? 'bg-red-500' : 'bg-indigo-600'} transition-all duration-1000" style="width: ${percent}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            <button onclick="deleteFaculty(${f.id})" class="text-slate-300 hover:text-red-500 transition-colors">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-faculty-count').innerText = facultyData.length;
+        }
+
+        function loadTimetable() {
+            const times = ["09:00", "10:00", "11:00", "12:00", "01:00", "02:00", "03:00"];
+            const body = document.getElementById('timetable-body');
+            body.innerHTML = times.map(time => `
+                <div class="timetable-grid border-b border-slate-100">
+                    <div class="p-6 border-r border-slate-100 text-xs font-black text-slate-300 flex items-center justify-center">${time}</div>
+                    ${[1,2,3,4,5].map(day => {
+                        const hasClass = Math.random() > 0.7;
+                        return `
+                            <div class="p-3 border-r border-slate-50 h-32 transition-colors hover:bg-slate-50/30">
+                                ${hasClass ? `
+                                    <div class="bg-white border border-slate-200 p-4 rounded-2xl h-full shadow-sm flex flex-col justify-between group hover:border-indigo-200 hover:shadow-md transition-all">
+                                        <div>
+                                            <p class="text-[9px] font-black text-indigo-500 tracking-tighter uppercase mb-1">Lecture</p>
+                                            <p class="text-[13px] font-extrabold text-slate-800 leading-tight">Data Structures</p>
+                                        </div>
+                                        <div class="flex justify-between items-end">
+                                            <span class="text-[10px] text-slate-400 font-bold">R-402</span>
+                                            <i class="fa-solid fa-circle-check text-green-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('');
+        }
+
+        window.onload = () => {
+            renderFaculty();
+            loadTimetable();
+            updateStats();
+            showPage('overview');
+        };
+    </script>
+</body>
+</html>
