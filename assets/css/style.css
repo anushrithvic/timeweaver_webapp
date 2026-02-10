@@ -1,0 +1,114 @@
+/* Core Variables for Institutional Branding */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --accent: #06b6d4;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --bg-main: #f8fafc;
+    --sidebar-bg: #ffffff;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: #1e293b;
+}
+
+/* Dashboard Layout */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Custom Styling */
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    border-right: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+.nav-link.active {
+    background: #f1f5f9;
+    color: var(--primary);
+    border-right-color: var(--primary);
+}
+
+/* Timetable Grid System */
+.timetable-wrapper {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+}
+
+.grid-header {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    background: #1e293b;
+    color: white;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.time-cell {
+    padding: 20px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-align: center;
+    border-right: 1px solid #f1f5f9;
+}
+
+.slot-cell {
+    padding: 10px;
+    min-height: 120px;
+    border-right: 1px solid #f1f5f9;
+}
+
+/* Class Card Design */
+.class-card {
+    background: #eef2ff;
+    border-left: 4px solid var(--primary);
+    padding: 10px;
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Modal Styling */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: none; /* Controlled by JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver Student | v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .sidebar-item.active {
+            background-color: #f0f4ff;
+            color: #4f46e5;
+            border-right: 4px solid #4f46e5;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex">
+            <div class="p-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-xl tracking-tight">TimeWeaver</h1>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Student Portal</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 mt-4">
+                <button onclick="showPage('dashboard')" id="btn-dashboard"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all active">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </button>
+                <button onclick="showPage('schedule')" id="btn-schedule"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-calendar-week w-5"></i>
+                    <span class="font-medium text-sm">Class Schedule</span>
+                </button>
+            </nav>
+
+            <div class="p-4 mt-auto border-t border-slate-100">
+                <div class="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                    title="My Profile">
+                    <div
+                        class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs">
+                        ST
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-700 truncate">Student User</p>
+                        <p class="text-xs text-slate-400 truncate">Computer Science</p>
+                    </div>
+                </div>
+                <a href="../login.html"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                    <span class="font-bold text-sm">Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+            <!-- DASHBOARD PAGE -->
+            <div id="page-dashboard" class="page-content p-8">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Student Dashboard</h2>
+                    <p class="text-slate-500 mt-1">Stay updated with your academic schedule.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Today's Schedule -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                                <h3 class="font-bold text-lg text-slate-800">Today's Classes</h3>
+                                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full"
+                                    id="current-day-badge">Monday</span>
+                            </div>
+                            <div class="p-6">
+                                <div id="todays-classes-list" class="space-y-4">
+                                    <!-- Injected via JS -->
+                                    <p class="text-slate-400 text-center py-4">No classes scheduled for today.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming / Notices -->
+                    <div class="space-y-6">
+                        <div class="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg shadow-indigo-200">
+                            <h3 class="font-bold text-lg mb-2">Upcoming Exam</h3>
+                            <p class="text-indigo-100 text-sm mb-4">Mid-term examinations start next week using the new
+                                schedule.</p>
+                            <button class="bg-white text-indigo-600 text-xs font-bold px-4 py-2 rounded-lg">View
+                                Details</button>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-slate-800">Announcements</h3>
+                            <ul class="space-y-4">
+                                <li class="flex gap-3 items-start">
+                                    <div class="w-2 h-2 rounded-full bg-red-500 mt-2 flex-shrink-0"></div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Lab Rescheduled</p>
+                                        <p class="text-xs text-slate-500">CS302 Lab moved to Room 405.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3 items-start">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-700">Guest Lecture</p>
+                                        <p class="text-xs text-slate-500">Dr. Alan Turing on AI Ethics.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCHEDULE PAGE -->
+            <div id="page-schedule" class="page-content p-8 hidden">
+                <header class="mb-10 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Weekly Timetable</h2>
+                        <p class="text-slate-500 mt-1">Complete academic calendar for your batch.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select
+                            class="bg-white border-slate-200 border rounded-lg px-4 py-2 text-sm font-semibold focus:ring-2 ring-indigo-500 outline-none">
+                            <option>Sem 6 - CS</option>
+                        </select>
+                    </div>
+                </header>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-x-auto">
+                    <div class="min-w-[800px]">
+                        <div
+                            class="grid grid-cols-6 bg-slate-800 text-white font-bold text-[11px] uppercase tracking-widest">
+                            <div class="p-5 border-r border-slate-700 text-center">Time</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Monday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Tuesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Wednesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Thursday</div>
+                            <div class="p-5 text-center">Friday</div>
+                        </div>
+                        <div id="student-timetable-body">
+                            <!-- Classes injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

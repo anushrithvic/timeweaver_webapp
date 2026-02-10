@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver Admin | v1.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .sidebar-item.active {
+            background-color: #f0f4ff;
+            color: #4f46e5;
+            border-right: 4px solid #4f46e5;
+        }
+
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(5, 1fr);
+        }
+
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex">
+            <div class="p-6 flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <i class="fa-solid fa-clock-rotate-left text-white text-xl"></i>
+                </div>
+                <h1 class="font-bold text-xl tracking-tight">TimeWeaver</h1>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
+                <button onclick="showPage('overview')" id="btn-overview"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span class="font-medium text-sm">Overview</span>
+                </button>
+                <div class="h-px bg-slate-100 my-2 mx-4"></div>
+
+                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">Resources</p>
+                <button onclick="showPage('faculty')" id="btn-faculty"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-id-card-clip w-5"></i>
+                    <span class="font-medium text-sm">Faculty Manager</span>
+                </button>
+                <button onclick="showPage('student')" id="btn-student"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-user-graduate w-5"></i>
+                    <span class="font-medium text-sm">Student Manager</span>
+                </button>
+                <button onclick="showPage('rooms')" id="btn-rooms"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-door-open w-5"></i>
+                    <span class="font-medium text-sm">Room Manager</span>
+                </button>
+
+                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">System</p>
+                <button onclick="showPage('timetable')" id="btn-timetable"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="font-medium text-sm">Master Schedule</span>
+                </button>
+                <button onclick="showPage('institution')" id="btn-institution"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-building-columns w-5"></i>
+                    <span class="font-medium text-sm">Institution Rules</span>
+                </button>
+
+                <div class="mt-auto pt-4 pb-4">
+                    <a href="../login.html"
+                        class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all">
+                        <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                        <span class="font-medium text-sm">Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+
+            <div id="page-overview" class="page-content p-8">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-800">System Dashboard</h2>
+                    <p class="text-slate-500 mt-1">Real-time institutional resource monitoring.</p>
+                </header>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div
+                            class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+                            <i class="fa-solid fa-user-tie text-xl"></i>
+                        </div>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Faculty</p>
+                        <p class="text-3xl font-black mt-1" id="stat-faculty-count">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FACULTY PAGE -->
+            <div id="page-faculty" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Faculty & Workload</h2>
+                        <p class="text-slate-500">Assign hours and monitor capacity limits.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-faculty', true)"
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Faculty
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Faculty Member</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Subject</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-right">Workload
+                                    Progress</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="faculty-list" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STUDENT PAGE -->
+            <div id="page-student" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Student Directory</h2>
+                        <p class="text-slate-500">Manage student enrollment and batch details.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-student', true)"
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Student
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Student Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Roll No</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Details (Dept/Batch)
+                                </th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Section</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-list" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ROOMS PAGE (NEW) -->
+            <div id="page-rooms" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Room Manager</h2>
+                        <p class="text-slate-500">Configure classrooms, labs, and auditoriums.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-room', true)"
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Room
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Room Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Type</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Capacity</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Features</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="room-list" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- INSTITUTION PAGE -->
+            <div id="page-institution" class="page-content p-8 hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Institution Settings</h2>
+                    <p class="text-slate-500 mt-1">Configure global parameters and scheduling rules.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Global Settings -->
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6">General Configuration</h3>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Institution
+                                Name</label>
+                            <input type="text" id="inst-name"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
+                                placeholder="e.g. Gotham University">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Academic Year</label>
+                            <input type="text" id="inst-year"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
+                                placeholder="e.g. 2025-2026">
+                        </div>
+                        <button onclick="saveInstitution()"
+                            class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-200">Save
+                            Configuration</button>
+                    </div>
+
+                    <!-- Rule Manager -->
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-slate-800">Scheduling Rules</h3>
+                            <button onclick="toggleModal('modal-rule', true)"
+                                class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Add Rule
+                            </button>
+                        </div>
+                        <div id="rule-list" class="max-h-[400px] overflow-y-auto pr-2">
+                            <!-- Rules injected here -->
+                            <p class="text-sm text-slate-400 italic text-center py-4">No rules defined yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIMETABLE PAGE -->
+            <div id="page-timetable" class="page-content p-8 hidden">
+                <div class="flex flex-col gap-6 mb-8">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Master Schedule Engine</h2>
+
+                    <!-- Filter Panel -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-xs font-bold text-red-800 uppercase mb-4 tracking-widest text-center">MAKE YOUR
+                            SELECTION</h3>
+                        <div class="flex flex-wrap items-center justify-center gap-4 mb-6">
+                            <div class="flex items-center gap-2">
+                                <select id="tt-year"
+                                    class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
+                                    <option value="2025-26">2025-26</option>
+                                    <option value="2026-27">2026-27</option>
+                                </select>
+                            </div>
+                            <!-- ... other selects ... -->
+                            <div class="flex items-center gap-2">
+                                <select id="tt-program"
+                                    class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
+                                    <option value="B.Tech">B.Tech.</option>
+                                    <option value="M.Tech">M.Tech.</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-dept"
+                                    class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
+                                    <option value="CSE">CSE</option>
+                                    <option value="IT">IT</option>
+                                    <option value="EE">EE</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-sem"
+                                    class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6" selected>6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-sec"
+                                    class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="G">G</option>
+                                </select>
+                            </div>
+                            <button onclick="loadTimetable(true)"
+                                class="bg-slate-100 border border-slate-300 text-slate-700 px-6 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-200 transition-colors">Show
+                                Details</button>
+                        </div>
+
+                        <div class="flex justify-center gap-4 border-t border-slate-100 pt-6">
+                            <button onclick="generateTimetable('generate')"
+                                class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate New
+                            </button>
+                            <button onclick="generateTimetable('regenerate')"
+                                class="bg-white border border-red-200 text-red-500 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-red-50 transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-rotate"></i> Regenerate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-x-auto">
+                    <div class="min-w-[1000px]">
+                        <div
+                            class="timetable-grid bg-slate-800 text-white font-bold text-[11px] uppercase tracking-widest">
+                            <div class="p-5 border-r border-slate-700">Hour</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Monday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Tuesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Wednesday</div>
+                            <div class="p-5 border-r border-slate-700 text-center">Thursday</div>
+                            <div class="p-5 text-center">Friday</div>
+                        </div>
+                        <div id="timetable-body"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Faculty Modal -->
+    <div id="modal-faculty" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add Faculty Member</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label><input
+                        type="text" id="fac-name"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label><select
+                            id="fac-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>CS</option>
+                            <option>IT</option>
+                            <option>EE</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Role</label><select
+                            id="fac-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>Professor</option>
+                            <option>Assoc. Professor</option>
+                            <option>Lecturer</option>
+                        </select></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Date of Birth
+                        (Password)</label><input type="date" id="fac-dob"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                <!-- New Subject Field -->
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Primary Subject</label><input
+                        type="text" id="fac-subject"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        placeholder="e.g. Data Structures"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Max Hours</label><input
+                        type="number" id="fac-max" value="18"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-faculty', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveFaculty()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    to System</button></div>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div id="modal-student" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add New Student</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label><input
+                        type="text" id="stu-name"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Roll Number</label><input
+                            type="text" id="stu-roll"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Batch / Year</label><input
+                            type="text" id="stu-batch"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label><select
+                            id="stu-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>CSE</option>
+                            <option>IT</option>
+                            <option>EE</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Section</label><input
+                            type="text" id="stu-sec"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                            placeholder="e.g. A"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Date of Birth
+                        (Password)</label><input type="date" id="stu-dob"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-student', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveStudent()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Student</button></div>
+        </div>
+    </div>
+
+    <!-- Room Modal -->
+    <div id="modal-room" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add New Room</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Building</label><input
+                            type="text" id="room-building"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Room No</label><input
+                            type="text" id="room-number"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Type</label><select
+                            id="room-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option value="classroom">Classroom</option>
+                            <option value="lab">Lab</option>
+                            <option value="auditorium">Auditorium</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Capacity</label><input
+                            type="number" id="room-capacity"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-projector" class="w-4 h-4 text-indigo-600 rounded"> Projector</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-lab" class="w-4 h-4 text-indigo-600 rounded"> Lab Equip</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-ac" class="w-4 h-4 text-indigo-600 rounded"> A/C</label>
+                </div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-room', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveRoom()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Room</button></div>
+        </div>
+    </div>
+
+    <!-- Rule Modal -->
+    <div id="modal-rule" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add Constraint Rule</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Rule Name</label><input
+                        type="text" id="rule-name"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        placeholder="e.g. No Morning Classes"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Description</label><textarea
+                        id="rule-desc" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Type</label><select
+                            id="rule-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option value="TIME_WINDOW">Time Window</option>
+                            <option value="CAPACITY">Capacity Check</option>
+                            <option value="GAP">Gap Constraint</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Weight</label><input
+                            type="number" id="rule-weight" value="1.0" step="0.1"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="pt-2"><label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input
+                            type="checkbox" id="rule-hard" checked class="w-4 h-4 text-red-600 rounded"> Hard Constraint
+                        (Required)</label></div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-rule', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveRule()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Rule</button></div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="app.js"></script>
+
+</body>
+
+</html>

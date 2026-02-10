@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver | Conflict Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .sidebar-item.active {
+            background-color: #f0f4ff;
+            color: #4f46e5;
+            border-right: 4px solid #4f46e5;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 h-screen overflow-hidden flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 h-full bg-white border-r border-slate-200 flex flex-col z-10" id="sidebar">
+        <div class="p-6 flex items-center gap-3 mb-6">
+            <div
+                class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                <i class="fa-solid fa-bolt text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">AccessGuard</h1>
+                <p class="text-xs text-slate-500">Conflict Monitor</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="#" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                <i class="fa-solid fa-triangle-exclamation w-5"></i>
+                <span class="font-medium text-sm">Active Conflicts</span>
+                <span class="ml-auto bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    id="nav-count">0</span>
+            </a>
+            <a href="#"
+                class="sidebar-item flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                <i class="fa-solid fa-clock-rotate-left w-5"></i>
+                <span class="font-medium text-sm">History</span>
+            </a>
+            <a href="#"
+                class="sidebar-item flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                <i class="fa-solid fa-sliders w-5"></i>
+                <span class="font-medium text-sm">Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-4 mt-auto">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <h4 class="text-sm font-semibold text-slate-700 mb-1">System Status</h4>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs text-green-600 font-medium">Monitoring Active</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5 mt-2">
+                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto relative p-8">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-1">Dashboard Overview</h2>
+                <p class="text-slate-500">Real-time scheduling conflict detection</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-slate-400 hover:text-slate-600 transition-colors relative">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span
+                        class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-50"></span>
+                </button>
+                <div class="h-10 w-10 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
+                    <!-- Placeholder Avatar -->
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin">
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Card 1 -->
+            <div
+                class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-all">
+                <div
+                    class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-bolt text-6xl text-red-600"></i>
+                </div>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Critical Conflicts</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-800" id="stat-critical">0</span>
+                    <span
+                        class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold">
+                        <i class="fa-solid fa-arrow-up"></i> 12%
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+                class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-amber-200 transition-all">
+                <div
+                    class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-triangle-exclamation text-6xl text-amber-500"></i>
+                </div>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Warnings</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-800" id="stat-warnings">0</span>
+                    <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-bold">Requires
+                        Review</span>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+                class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-green-200 transition-all">
+                <div
+                    class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-check-circle text-6xl text-green-500"></i>
+                </div>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Resolved Today</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-800" id="stat-resolved">0</span>
+                    <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-bold">+5 from
+                        yesterday</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter / Actions Bar -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                <button
+                    class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-bold shadow-sm transition-all">All</button>
+                <button
+                    class="px-4 py-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 rounded-lg text-sm font-medium transition-all">Room
+                    Conflicts</button>
+                <button
+                    class="px-4 py-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 rounded-lg text-sm font-medium transition-all">Faculty
+                    Overlaps</button>
+            </div>
+            <button
+                class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center gap-2">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Conflicts List -->
+        <div class="space-y-4" id="conflicts-container">
+            <!-- Items will be injected here via JS -->
+            <div class="flex items-center justify-center p-12 text-slate-400">
+                <i class="fa-solid fa-spinner fa-spin mr-3"></i> Loading conflicts...
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
